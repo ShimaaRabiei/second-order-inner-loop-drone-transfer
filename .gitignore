@@ -10,3 +10,6 @@ results/*
 .idea/
 
 *.log
+
+HOW_TO_RUN.txt
+notepad HOW_TO_RUN.txt
