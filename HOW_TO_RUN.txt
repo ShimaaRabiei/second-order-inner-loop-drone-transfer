@@ -1,0 +1,173 @@
+@'
+HOW TO RUN THIS PROJECT
+=======================
+
+Project folder:
+C:\Users\rabiei\My Research\second-order-inner-loop-drone-transfer
+
+
+1. HOW TO OPEN POWERSHELL IN THIS FOLDER
+----------------------------------------
+
+Option A: From File Explorer
+
+1. Open this folder in File Explorer:
+
+   C:\Users\rabiei\My Research\second-order-inner-loop-drone-transfer
+
+2. Click the address bar at the top, or press:
+
+   Ctrl + L
+
+3. Type:
+
+   powershell
+
+4. Press Enter.
+
+PowerShell should open in this folder. You should see something like:
+
+   PS C:\Users\rabiei\My Research\second-order-inner-loop-drone-transfer>
+
+
+Option B: From an already-open PowerShell window
+
+Run:
+
+   cd "C:\Users\rabiei\My Research\second-order-inner-loop-drone-transfer"
+
+
+2. INSTALL REQUIRED PACKAGES
+----------------------------
+
+Run this once before using the scripts:
+
+   python -m pip install -r requirements.txt
+
+
+3. CHECK THAT THE PYTHON FILES ARE OKAY
+---------------------------------------
+
+Run:
+
+   python -m py_compile src\env_second_order_inner_loop.py scripts\evaluate_lambda_comparison.py scripts\evaluate_lambda_summary.py
+
+If there is no red error, the files are syntactically okay.
+
+
+4. MAIN SCRIPT TO USE: COMPACT LAMBDA SUMMARY
+---------------------------------------------
+
+This is the recommended script for normal use:
+
+   scripts\evaluate_lambda_summary.py
+
+It uses the trusted comprehensive comparison code, but it does not generate all the many detailed plots.
+
+It evaluates the lambda policies:
+
+   lambda = 0
+   lambda = 5
+   lambda = 10
+   lambda = 15
+
+over the selected omega_n and zeta values.
+
+
+5. RUN WITH ZETA = 0.4 AND FULL OMEGA_N LIST
+--------------------------------------------
+
+Run:
+
+   python scripts\evaluate_lambda_summary.py --zeta 0.4 --wn_values 2 4 6 8 10 12
+
+
+6. RUN A QUICK TEST WITH FEWER ROLLOUTS
+--------------------------------------
+
+This is useful to make sure everything is working before running the full evaluation.
+
+Run:
+
+   python scripts\evaluate_lambda_summary.py --zeta 0.7 --wn_values 2 4 --max_rollouts 20
+
+
+7. RUN WITH ZETA = 0.7 AND FULL OMEGA_N LIST, WITHOUT PLOT WINDOW
+-----------------------------------------------------------------
+
+This saves the CSV files but does not open the summary plot window.
+
+Run:
+
+   python scripts\evaluate_lambda_summary.py --zeta 0.7 --wn_values 2 4 6 8 10 12 --no_plot
+
+
+8. WHERE THE RESULTS ARE SAVED
+------------------------------
+
+Results are saved inside:
+
+   results\
+
+For example, the compact summary script creates folders like:
+
+   results\lambda_summary_zeta_0.4_YYYYMMDD_HHMMSS
+   results\lambda_summary_zeta_0.7_YYYYMMDD_HHMMSS
+
+Inside each result folder, you should see files such as:
+
+   final_summary_metrics.csv
+   final_reward_diff_vs_lambda0.csv
+   final_reward_vs_wn_zeta_0.4.png
+
+If you use --no_plot, the PNG plot may not be created.
+
+
+9. FULL DIAGNOSTIC SCRIPT
+-------------------------
+
+The full script is:
+
+   scripts\evaluate_lambda_comparison.py
+
+It creates many plots for detailed debugging and analysis.
+
+Run:
+
+   python scripts\evaluate_lambda_comparison.py
+
+Use this only when you want all detailed plots, because it generates many figures.
+
+
+10. IMPORTANT NOTES
+-------------------
+
+- The environment code is in:
+
+   src\env_second_order_inner_loop.py
+
+- The fixed evaluation initial states are in:
+
+   data\eval_initial_states_333.npy
+
+- The trained PPO policies and VecNormalize files are in:
+
+   models\lambda_policies\
+
+- The recommended script for GitHub and normal reporting is:
+
+   python scripts\evaluate_lambda_summary.py --zeta 0.4 --wn_values 2 4 6 8 10 12
+
+- To test a different damping ratio, change the value after --zeta.
+
+Example:
+
+   python scripts\evaluate_lambda_summary.py --zeta 0.6 --wn_values 2 4 6 8 10 12
+
+- To test fewer initial states, use --max_rollouts.
+
+Example:
+
+   python scripts\evaluate_lambda_summary.py --zeta 0.4 --wn_values 2 4 --max_rollouts 20
+
+'@ | Set-Content "HOW_TO_RUN.txt"
