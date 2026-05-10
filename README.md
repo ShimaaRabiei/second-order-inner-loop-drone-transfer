@@ -5,7 +5,7 @@ This repository contains code for training reduced-order PPO policies and evalua
 The main goal is to compare policies trained with different attitude-reference smoothness penalties:
 
 $$
-\lambda \in \{0, 5, 10, 15\}
+\lambda \in \{0, 5, 10, 15\}.
 $$
 
 The trained reduced-order policies are deployed on a high-order drone model where the policy outputs a desired attitude reference, and a second-order inner-loop controller tracks this reference.
@@ -18,25 +18,40 @@ The experiments evaluate how the smoothness penalty affects transfer performance
 
 ### Full High-Order Drone Model
 
-The full internal high-order state is:
+The full internal high-order state is
 
 $$
 s_k =
-[x_k, \dot{x}_k, z_k, \dot{z}_k, \theta_k, \dot{\theta}_k]^T
+\begin{bmatrix}
+x_k &
+\dot{x}_k &
+z_k &
+\dot{z}_k &
+\theta_k &
+\dot{\theta}_k
+\end{bmatrix}^{T}.
 $$
 
 The PPO policy does not observe the full state. It observes only the reduced translational state:
 
 $$
 o_k =
-[x_k, \dot{x}_k, z_k, \dot{z}_k]^T
+\begin{bmatrix}
+x_k &
+\dot{x}_k &
+z_k &
+\dot{z}_k
+\end{bmatrix}^{T}.
 $$
 
-The policy action is:
+The policy action is
 
 $$
 a_k =
-[\Delta T_k, \theta_k^\star]^T
+\begin{bmatrix}
+\Delta T_k &
+\theta_k^{\star}
+\end{bmatrix}^{T},
 $$
 
 where `Delta T` is the thrust correction and `theta_star` is the desired attitude reference.
@@ -46,19 +61,21 @@ The high-order model uses a second-order attitude inner loop:
 $$
 J \ddot{\theta}
 =
--K_p(\theta - \theta^\star)
+-K_p(\theta - \theta^{\star})
 -
-K_d(\dot{\theta} - \dot{\theta}^{\star}_{\mathrm{est}})
+K_d(\dot{\theta} - \dot{\theta}^{\star}_{\mathrm{est}}).
 $$
 
-The gains are parameterized by natural frequency and damping ratio:
+The gains are parameterized by the natural frequency and damping ratio as
 
 $$
-K_p = J \omega_n^2
+K_p = J \omega_n^2,
 $$
 
+and
+
 $$
-K_d = 2J\zeta\omega_n
+K_d = 2J\zeta\omega_n.
 $$
 
 ---
@@ -67,21 +84,29 @@ $$
 
 The reduced-order model is used to train the PPO policy before transfer.
 
-The reduced-order observation is:
+The reduced-order observation is
 
 $$
 o_k =
-[x_k, \dot{x}_k, z_k, \dot{z}_k]^T
+\begin{bmatrix}
+x_k &
+\dot{x}_k &
+z_k &
+\dot{z}_k
+\end{bmatrix}^{T}.
 $$
 
-The reduced-order action is:
+The reduced-order action is
 
 $$
 a_k =
-[\Delta T_k, \theta_k^\star]^T
+\begin{bmatrix}
+\Delta T_k &
+\theta_k^{\star}
+\end{bmatrix}^{T}.
 $$
 
-In the reduced-order model, the second action component is applied directly as the attitude reference. During transfer, this same policy output becomes the desired attitude command tracked by the high-order second-order inner loop.
+In the reduced-order model, the second action component is applied directly as the desired attitude reference. During transfer, this same policy output becomes the desired attitude command tracked by the high-order second-order inner loop.
 
 The reduced-order training reward includes a distance-to-target term and an optional smoothness penalty on changes in the desired attitude reference:
 
@@ -90,10 +115,15 @@ r_k^{\lambda}
 =
 r_k
 -
-\lambda |\theta_k^\star - \theta_{k-1}^\star|
+\lambda
+\left|
+\theta_k^{\star}
+-
+\theta_{k-1}^{\star}
+\right|.
 $$
 
-where `lambda` controls how strongly the policy is encouraged to produce smoother attitude-reference commands.
+Here, `lambda` controls how strongly the policy is encouraged to produce smoother attitude-reference commands.
 
 ---
 
@@ -183,7 +213,9 @@ python scripts\train_reduced_order_policy.py --lambda_pen 15
 
 The trained policy and VecNormalize statistics are saved under:
 
-`models/lambda_policies/`
+```text
+models/lambda_policies/
+```
 
 For example:
 
@@ -196,7 +228,7 @@ models/lambda_policies/lambda_0_vecnormalize.pkl
 
 ## Warm-Start Reduced-Order Training
 
-To warm-start from an existing PPO policy and VecNormalize statistics, provide the previous model and vector normalization files explicitly.
+To warm-start from an existing PPO policy and VecNormalize statistics, provide the previous model and vector-normalization files explicitly.
 
 Example:
 
@@ -223,10 +255,22 @@ To evaluate a reduced-order policy using explicit model and VecNormalize paths, 
 python scripts\evaluate_reduced_order_rollout.py --lambda_pen 0 --model "models\lambda_policies\lambda_0_test1_policy.zip" --vecnormalize "models\lambda_policies\lambda_0_test1_vecnormalize.pkl"
 ```
 
-By default, the evaluation uses the fixed initial state:
+By default, the evaluation uses the fixed initial state
 
 $$
-[x_0, \dot{x}_0, z_0, \dot{z}_0] = [1, 1, 1, 1]
+\begin{bmatrix}
+x_0 &
+\dot{x}_0 &
+z_0 &
+\dot{z}_0
+\end{bmatrix}
+=
+\begin{bmatrix}
+1 &
+1 &
+1 &
+1
+\end{bmatrix}.
 $$
 
 To use a random initial condition instead, run:
@@ -261,10 +305,12 @@ final_reward_diff_vs_lambda0.csv
 final_reward_diff_vs_lambda0_zeta_*.png
 ```
 
-The main plotted quantity is:
+The main plotted quantity is
 
 $$
-J_{\mathrm{rew}}(\lambda) - J_{\mathrm{rew}}(\lambda=0)
+J_{\mathrm{rew}}(\lambda)
+-
+J_{\mathrm{rew}}(\lambda = 0).
 $$
 
 This shows the improvement or degradation of each lambda policy relative to the `lambda = 0` baseline.
