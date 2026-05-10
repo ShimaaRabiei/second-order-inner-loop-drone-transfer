@@ -4,9 +4,9 @@ This repository contains code for training reduced-order PPO policies and evalua
 
 The main goal is to compare policies trained with different attitude-reference smoothness penalties:
 
-$$
+```math
 \lambda \in \{0, 5, 10, 15\}.
-$$
+```
 
 The trained reduced-order policies are deployed on a high-order drone model where the policy outputs a desired attitude reference, and a second-order inner-loop controller tracks this reference.
 
@@ -20,7 +20,7 @@ The experiments evaluate how the smoothness penalty affects transfer performance
 
 The full internal high-order state is
 
-$$
+```math
 s_k =
 \begin{bmatrix}
 x_k &
@@ -30,11 +30,11 @@ z_k &
 \theta_k &
 \dot{\theta}_k
 \end{bmatrix}^{T}.
-$$
+```
 
 The PPO policy does not observe the full state. It observes only the reduced translational state:
 
-$$
+```math
 o_k =
 \begin{bmatrix}
 x_k &
@@ -42,41 +42,41 @@ x_k &
 z_k &
 \dot{z}_k
 \end{bmatrix}^{T}.
-$$
+```
 
 The policy action is
 
-$$
+```math
 a_k =
 \begin{bmatrix}
 \Delta T_k &
 \theta_k^{\star}
 \end{bmatrix}^{T},
-$$
+```
 
 where `Delta T` is the thrust correction and `theta_star` is the desired attitude reference.
 
 The high-order model uses a second-order attitude inner loop:
 
-$$
+```math
 J \ddot{\theta}
 =
 -K_p(\theta - \theta^{\star})
 -
 K_d(\dot{\theta} - \dot{\theta}^{\star}_{\mathrm{est}}).
-$$
+```
 
 The gains are parameterized by the natural frequency and damping ratio as
 
-$$
+```math
 K_p = J \omega_n^2,
-$$
+```
 
 and
 
-$$
+```math
 K_d = 2J\zeta\omega_n.
-$$
+```
 
 ---
 
@@ -86,7 +86,7 @@ The reduced-order model is used to train the PPO policy before transfer.
 
 The reduced-order observation is
 
-$$
+```math
 o_k =
 \begin{bmatrix}
 x_k &
@@ -94,23 +94,23 @@ x_k &
 z_k &
 \dot{z}_k
 \end{bmatrix}^{T}.
-$$
+```
 
 The reduced-order action is
 
-$$
+```math
 a_k =
 \begin{bmatrix}
 \Delta T_k &
 \theta_k^{\star}
 \end{bmatrix}^{T}.
-$$
+```
 
 In the reduced-order model, the second action component is applied directly as the desired attitude reference. During transfer, this same policy output becomes the desired attitude command tracked by the high-order second-order inner loop.
 
 The reduced-order training reward includes a distance-to-target term and an optional smoothness penalty on changes in the desired attitude reference:
 
-$$
+```math
 r_k^{\lambda}
 =
 r_k
@@ -121,7 +121,7 @@ r_k
 -
 \theta_{k-1}^{\star}
 \right|.
-$$
+```
 
 Here, `lambda` controls how strongly the policy is encouraged to produce smoother attitude-reference commands.
 
@@ -257,7 +257,7 @@ python scripts\evaluate_reduced_order_rollout.py --lambda_pen 0 --model "models\
 
 By default, the evaluation uses the fixed initial state
 
-$$
+```math
 \begin{bmatrix}
 x_0 &
 \dot{x}_0 &
@@ -271,7 +271,7 @@ z_0 &
 1 &
 1
 \end{bmatrix}.
-$$
+```
 
 To use a random initial condition instead, run:
 
@@ -307,11 +307,11 @@ final_reward_diff_vs_lambda0_zeta_*.png
 
 The main plotted quantity is
 
-$$
+```math
 J_{\mathrm{rew}}(\lambda)
 -
 J_{\mathrm{rew}}(\lambda = 0).
-$$
+```
 
 This shows the improvement or degradation of each lambda policy relative to the `lambda = 0` baseline.
 
